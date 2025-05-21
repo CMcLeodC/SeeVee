@@ -1,0 +1,15 @@
+Python
+
+pycache/ *.pyc *.pyo *.pyd .Python env/ venv/ ENV/
+
+Environment variables
+
+.env
+
+IDEs
+
+.vscode/ .idea/
+
+Vercel
+
+.vercel
