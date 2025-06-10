@@ -7,7 +7,7 @@ async def get_job_history(db: AsyncSession, user_id: str):
     try:
         query = select(JobHistory).where(JobHistory.user_id == uuid.UUID(user_id)).order_by(JobHistory.end_date.desc())
         result = await db.execute(query)
-        return result.scalars().all()
+        return result.scalars().all()  # Return JobHistory objects
     except Exception as e:
         print(f"Error fetching job history: {str(e)}")
         return []
