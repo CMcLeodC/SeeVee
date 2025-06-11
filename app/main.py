@@ -17,7 +17,6 @@ from app.schemas.skills import SkillSchema
 from typing import List
 import logging
 
-
 app = FastAPI(title="CV Portfolio API", description="AI-powered CV query backend")
 
 # Set up logging
@@ -65,8 +64,10 @@ async def query_endpoint(query_input: QueryInput, db: AsyncSession = Depends(get
             display_hint = "text"
             data = []
 
-        # Save to chat history
-        await save_chat_history(db, user_id, query, response_text)
+        # Save to chat history in a separate session context
+        async with db.__class__() as chat_session:  # Create new session
+            await save_chat_history(chat_session, user_id, query, response_text)
+            await chat_session.commit()
 
         return QueryResponse(
             response=response_text,

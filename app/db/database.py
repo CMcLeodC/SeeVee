@@ -7,11 +7,7 @@ load_dotenv()
 
 # Supabase PostgreSQL connection
 DATABASE_URL = os.getenv("SUPABASE_URL")
-engine = create_async_engine(
-    DATABASE_URL,
-    echo=True,
-    connect_args={"statement_cache_size": 0}  # Disable statement cache for PgBouncer
-)
+engine = create_async_engine(DATABASE_URL, echo=True)
 
 # Async session factory
 async_session = sessionmaker(
