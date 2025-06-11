@@ -14,7 +14,8 @@ engine = create_async_engine(
         "statement_cache_size": 0,
         "prepared_statement_cache_size": 0,
         "server_settings": {"application_name": "SeeVee"}
-    }
+    },
+    pool_pre_ping=True  # Ensure connection health
 )
 
 # Async session factory
