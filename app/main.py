@@ -17,7 +17,6 @@ from app.schemas.skills import SkillSchema
 from typing import List
 import logging
 
-
 app = FastAPI(title="CV Portfolio API", description="AI-powered CV query backend")
 
 # Set up logging

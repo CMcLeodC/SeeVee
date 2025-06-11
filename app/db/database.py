@@ -12,6 +12,7 @@ engine = create_async_engine(
     echo=True,
     connect_args={
         "statement_cache_size": 0,
+        "prepared_statement_cache_size": 0,
         "server_settings": {"application_name": "SeeVee"}
     }
 )
