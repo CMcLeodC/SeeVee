@@ -7,6 +7,7 @@ load_dotenv()
 
 # Supabase PostgreSQL connection
 DATABASE_URL = os.getenv("SUPABASE_URL")
+
 engine = create_async_engine(
     DATABASE_URL,
     echo=True,
