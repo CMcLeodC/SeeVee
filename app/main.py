@@ -19,7 +19,6 @@ import logging
 
 app = FastAPI(title="CV Portfolio API", description="AI-powered CV query backend")
 
-# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -33,7 +32,6 @@ async def query_endpoint(query_input: QueryInput, db: AsyncSession = Depends(get
         query = query_input.query.lower()
         user_id = "b4fceb51-aaf8-4de7-a209-0a38d730c61d"  # Hardcoded for single-user MVP
 
-        # Basic query parsing (no LLM yet)
         if "recent jobs" in query or "work history" in query:
             jobs = await get_job_history(db, user_id)
             response_text = "Here are Connor's recent professional roles:"
