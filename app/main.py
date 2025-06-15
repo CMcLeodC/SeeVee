@@ -1,6 +1,10 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.db.database import get_db
+from contextlib import asynccontextmanager
+from dotenv import load_dotenv
+import os
+
+from app.db.database import create_engine_and_session
 from app.db.queries.job_history import get_job_history
 from app.db.queries.chat_history import save_chat_history
 from app.db.queries.users import get_user
@@ -17,11 +21,31 @@ from app.schemas.skills import SkillSchema
 from typing import List
 import logging
 
-app = FastAPI(title="CV Portfolio API", description="AI-powered CV query backend")
+load_dotenv()
+DATABASE_URL = os.getenv("SUPABASE_URL")
 
-# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    engine, session_factory = create_engine_and_session(DATABASE_URL)
+    app.state.engine = engine
+    app.state.session_factory = session_factory
+    yield
+    await engine.dispose()
+
+app = FastAPI(
+    title="CV Portfolio API",
+    description="AI-powered CV query backend",
+    lifespan=lifespan
+)
+
+# Dependency to get DB session
+async def get_db(request: Request):
+    session_factory = request.app.state.session_factory
+    async with session_factory() as session:
+        yield session
 
 @app.get("/")
 async def root():
@@ -31,14 +55,14 @@ async def root():
 async def query_endpoint(query_input: QueryInput, db: AsyncSession = Depends(get_db)):
     try:
         query = query_input.query.lower()
-        user_id = "b4fceb51-aaf8-4de7-a209-0a38d730c61d"  # Hardcoded for single-user MVP
+        user_id = "b4fceb51-aaf8-4de7-a209-0a38d730c61d"
 
-        # Basic query parsing (no LLM yet)
         if "recent jobs" in query or "work history" in query:
             jobs = await get_job_history(db, user_id)
             response_text = "Here are Connor's recent professional roles:"
             display_hint = "timeline"
             data = [JobHistorySchema.from_orm(job).dict() for job in jobs]
+            print(f"Job query returned: {jobs}")
         elif "projects" in query:
             projects = await get_projects(db, user_id)
             response_text = "Here are Connor's projects:"
@@ -64,7 +88,6 @@ async def query_endpoint(query_input: QueryInput, db: AsyncSession = Depends(get
             display_hint = "text"
             data = []
 
-        # Save to chat history
         await save_chat_history(db, user_id, query, response_text)
 
         return QueryResponse(
