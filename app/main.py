@@ -41,9 +41,18 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Dependency to get DB session
 async def get_db(request: Request):
-    session_factory = request.app.state.session_factory
+    # Try to get from app state
+    session_factory = getattr(request.app.state, "session_factory", None)
+
+    # Fallback for Vercel or environments without lifespan
+    if session_factory is None:
+        from os import getenv
+        from dotenv import load_dotenv
+        load_dotenv()
+        DATABASE_URL = getenv("SUPABASE_URL")
+        _, session_factory = create_engine_and_session(DATABASE_URL)
+
     async with session_factory() as session:
         yield session
 
