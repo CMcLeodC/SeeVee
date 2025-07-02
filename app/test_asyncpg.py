@@ -1,10 +1,13 @@
 import asyncio
 import asyncpg
+from dotenv import load_dotenv
+import os
 
-url = "postgresql://postgres.ryyskfzwktcqjznlhtda:bump2025BuMP@aws-0-eu-west-2.pooler.supabase.com:6543/postgres"
+load_dotenv()
+DATABASE_URL = os.getenv("SUPABASE_URL")
 
 async def main():
-    conn = await asyncpg.connect(url, statement_cache_size=0)
+    conn = await asyncpg.connect(DATABASE_URL, statement_cache_size=0)
     result = await conn.fetch("SELECT * FROM job_history LIMIT 1")
     print(result)
     await conn.close()
