@@ -1,15 +1,23 @@
+import TimelineView from './TimelineView';
+
 export default function DataViewer({ items, hint }) {
+  if (!items || items.length === 0) return null;
+
+  if (hint === 'timeline') {
+    return <TimelineView items={items} />;
+  }
+
+  if (hint === 'text') {
+    return (
+      <div className="bg-white p-4 rounded shadow">
+        <p className="text-gray-700">{items[0]?.text || 'No content.'}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      {items.map((item) => (
-        <div key={item.id} className="bg-white p-4 rounded shadow">
-          <h3 className="text-lg font-semibold">{item.title} @ {item.company}</h3>
-          <p className="text-sm text-gray-600 mb-2">
-            {item.start_date} — {item.end_date || 'Present'}
-          </p>
-          <p>{item.description}</p>
-        </div>
-      ))}
+    <div className="bg-yellow-100 p-4 rounded border-l-4 border-yellow-400 text-yellow-900">
+      Unknown display hint: {hint}
     </div>
   );
 }

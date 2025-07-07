@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import DataViewer from './components/DataViewer'; // ✅ this is what was missing
 
 function App() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState('');
   const [data, setData] = useState([]);
+  const [hint, setHint] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async () => {
@@ -26,6 +28,7 @@ function App() {
       const result = await res.json();
       setSummary(result.response);
       setData(result.data);
+      setHint(result.display_hint); // ✅ important
     } catch (err) {
       console.error(err);
       setError('Something went wrong.');
@@ -64,21 +67,7 @@ function App() {
           </div>
         )}
 
-        {data.length > 0 && (
-          <div className="space-y-4">
-            {data.map((item) => (
-              <div key={item.id} className="bg-white p-4 rounded shadow">
-                <h3 className="text-lg font-semibold">
-                  {item.title} @ {item.company}
-                </h3>
-                <p className="text-sm text-gray-600 mb-1">
-                  {item.start_date} — {item.end_date || 'Present'}
-                </p>
-                <p>{item.description}</p>
-              </div>
-            ))}
-          </div>
-        )}
+        {data.length > 0 && <DataViewer items={data} hint={hint} />}
       </div>
     </div>
   );
